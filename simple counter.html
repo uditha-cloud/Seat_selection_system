@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Counter App</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial;
+      margin-top: 50px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    #status {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<p id="display">Count: 0</p>
+<button id="plus">+</button>
+<button id="minus">-</button>
+<button id="reset">Reset</button>
+<span id="status"></span>
+
+<script>
+  let count = 0;
+
+  const display = document.getElementById('display');
+  const status = document.getElementById('status');
+
+  // Single function to update UI
+  function updateUI() {
+    display.textContent = 'Count: ' + count;
+    status.textContent = count > 10 ? 'HIGH!' : '';
+  }
+
+  document.getElementById('plus').onclick = function() {
+    count++;
+    updateUI();
+  };
+
+  document.getElementById('minus').onclick = function() {
+    count--;
+    updateUI();
+  };
+
+  document.getElementById('reset').onclick = function() {
+    count = 0;
+    updateUI();
+  };
+</script>
+
+</body>
+</html>

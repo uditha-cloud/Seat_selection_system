@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Airline Seat Booking</title>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+.header{
+    background:#333;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logout{
+    background:red;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.cockpit{
+    background:#333;
+    color:white;
+    text-align:center;
+    padding:10px;
+    margin:20px 0;
+    border-radius:5px;
+}
+
+.panel{
+    background:#f4f4f4;
+    padding:20px;
+    border-radius:10px;
+    margin-top:20px;
+}
+
+select,input{
+    width:95%;
+    padding:10px;
+    margin:8px 0;
+}
+
+.row{
+    display:flex;
+    justify-content:center;
+    margin:5px;
+}
+
+.seat{
+    width:50px;
+    height:50px;
+    margin:4px;
+    line-height:50px;
+    text-align:center;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.first{background:#5eb659;}
+.business{background:#e62222;}
+.premium{background:#5eb659;}
+.economy{background:#5eb659;}
+
+.selected{
+    background:#f1c40f !important;
+}
+
+.booked{
+    background:#e62222 !important;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#27ae60;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h2>✈️ Select Your Seat</h2>
+
+    <div>
+        Welcome, uditha
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="cockpit">
+    🛫 COCKPIT 🛬
+</div>
+
+<div class="panel">
+
+<h3>Flight Details</h3>
+
+<label>From</label>
+<select id="from">
+    <option>Hyderabad</option>
+    <option>Chennai</option>
+    <option>Bangalore</option>
+</select>
+
+<label>To</label>
+<select id="to">
+    <option>Delhi</option>
+    <option>Mumbai</option>
+    <option>Kolkata</option>
+</select>
+
+<label>Flight Time</label>
+<select id="time">
+    <option>08:00 AM</option>
+    <option>02:00 PM</option>
+    <option>08:00 PM</option>
+</select>
+
+</div>
+
+<div id="seatMap"></div>
+
+<div class="panel">
+
+<h3>Passenger Details</h3>
+
+<input type="text" id="name" placeholder="Full Name">
+
+<input type="email" id="email" placeholder="Email">
+
+<h3>Selected Seats</h3>
+
+<p id="selectedSeats">None</p>
+
+<p id="totalPrice"><b>Total: $0</b></p>
+
+<button onclick="bookSeats()">
+Book Now
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+let seats=[];
+let selected=[];
+
+let rows=['A','B','C','D','E','F'];
+
+for(let i=0;i<rows.length;i++){
+
+    for(let j=1;j<=6;j++){
+
+        let type='economy';
+        let price=100;
+
+        if(i==0){
+            type='first';
+            price=1000;
+        }
+        else if(i==1){
+            type='business';
+            price=500;
+        }
+        else if(i==2){
+            type='premium';
+            price=250;
+        }
+
+        seats.push({
+            id:rows[i]+j,
+            row:rows[i],
+            col:j,
+            type:type,
+            price:price,
+            booked:Math.random()<0.2
+        });
+    }
+}
+
+function showSeats(){
+
+    let seatMap=document.getElementById("seatMap");
+
+    seatMap.innerHTML="";
+
+    rows.forEach(row=>{
+
+        let rowDiv=document.createElement("div");
+        rowDiv.className="row";
+
+        let rowSeats=seats.filter(s=>s.row===row);
+
+        rowSeats.forEach(seat=>{
+
+            let div=document.createElement("div");
+
+            div.className="seat "+seat.type;
+
+            if(seat.booked)
+                div.classList.add("booked");
+
+            if(selected.includes(seat.id))
+                div.classList.add("selected");
+
+            div.innerText=seat.id;
+
+            div.onclick=function(){
+
+                if(seat.booked)
+                    return;
+
+                if(selected.includes(seat.id))
+                {
+                    selected=
+                    selected.filter(
+                    s=>s!==seat.id);
+                }
+                else
+                {
+                    selected.push(seat.id);
+                }
+
+                showSeats();
+                updateInfo();
+            };
+
+            rowDiv.appendChild(div);
+        });
+
+        seatMap.appendChild(rowDiv);
+    });
+}
+
+function updateInfo(){
+
+    let total=0;
+
+    selected.forEach(id=>{
+
+        let seat=
+        seats.find(s=>s.id===id);
+
+        total+=seat.price;
+    });
+
+    document.getElementById(
+    "selectedSeats").innerText=
+    selected.length?
+    selected.join(", "):
+    "None";
+
+    document.getElementById(
+    "totalPrice").innerHTML=
+    "<b>Total: $"+total+"</b>";
+}
+
+function bookSeats(){
+
+    let name=
+    document.getElementById("name").value;
+
+    let email=
+    document.getElementById("email").value;
+
+    let from=
+    document.getElementById("from").value;
+
+    let to=
+    document.getElementById("to").value;
+
+    let time=
+    document.getElementById("time").value;
+
+    if(name=="" || email==""){
+        alert("Enter Passenger Details");
+        return;
+    }
+
+    if(selected.length==0){
+        alert("Select a Seat");
+        return;
+    }
+
+    alert(
+
+    "BOOKING CONFIRMED\n\n"+
+
+    "Passenger : "+name+
+
+    "\nFrom : "+from+
+
+    "\nTo : "+to+
+
+    "\nTime : "+time+
+
+    "\nSeat : "+selected.join(", ")
+
+    );
+
+}
+
+function logout(){
+
+    window.location.href=
+    "login.html";
+
+}
+
+showSeats();
+
+</script>
+
+</body>
+</html>
